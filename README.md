@@ -1,3 +1,13 @@
+---
+title: SRMSS
+emoji: 🚌
+colorFrom: blue
+colorTo: gray
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # SRMSS — Smart Route Management & Scheduling System
 
 Coursework implementation for **CS6003 Advanced Software Engineering**
