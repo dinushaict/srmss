@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SRMSS{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#1a1d21; --line:#e3e3df; --paper:#f4f3ee; --card:#fff; --muted:#6b7177;
+      --amber:#f2a900; --amber-deep:#c98a00; --green:#2e7d4f; --red:#c0392b; --blue:#2b6cb0;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0; background:var(--paper); color:var(--ink); font-family:"IBM Plex Sans",sans-serif; line-height:1.5;}
+    .mono{font-family:"IBM Plex Mono",monospace;}
+    header.topbar{background:var(--ink); color:#fff; padding:16px 28px; display:flex; align-items:center; justify-content:space-between; border-bottom:4px solid var(--amber);}
+    .brand{display:flex; align-items:baseline; gap:12px;}
+    .brand .logo{font-family:"Familjen Grotesk",sans-serif; font-weight:700; font-size:22px; letter-spacing:1px;}
+    .brand .tag{color:var(--amber); font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase;}
+    .topbar nav a{color:#cfd3d7; text-decoration:none; margin-left:18px; font-size:14px;}
+    .topbar nav a:hover{color:var(--amber);}
+    main{max-width:1040px; margin:30px auto; padding:0 24px;}
+    h1{font-family:"Familjen Grotesk",sans-serif; font-weight:700; font-size:26px; margin:0 0 4px;}
+    h2{font-family:"Familjen Grotesk",sans-serif; font-weight:700; font-size:18px; margin:28px 0 12px;}
+    .sub{color:var(--muted); margin:0 0 22px;}
+    .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px;}
+    table{width:100%; border-collapse:collapse; font-size:14px;}
+    th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);}
+    th{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted);}
+    td.num{font-family:"IBM Plex Mono",monospace; text-align:right;}
+    .pill{display:inline-block; padding:2px 9px; border-radius:999px; font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:600;}
+    .pill.due,.pill.delayed{background:#fbe3df; color:var(--red);}
+    .pill.ok,.pill.completed,.pill.on-time{background:#e2f0e8; color:var(--green);}
+    .pill.planned,.pill.maintenance,.pill.in_service{background:#e7eefb; color:var(--blue);}
+    .stat-row{display:flex; gap:14px; margin-bottom:8px; flex-wrap:wrap;}
+    .stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 18px; flex:1; min-width:130px;}
+    .stat .k{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted);}
+    .stat .v{font-family:"Familjen Grotesk",sans-serif; font-weight:700; font-size:24px; margin-top:2px;}
+    .btn{display:inline-block; background:var(--amber); color:var(--ink); text-decoration:none; font-weight:600; padding:9px 16px; border-radius:8px; border:none; cursor:pointer; font-family:"IBM Plex Sans",sans-serif; font-size:14px;}
+    .btn:hover{background:var(--amber-deep);}
+    input,select{padding:8px 10px; border:1px solid var(--line); border-radius:7px; font-family:"IBM Plex Sans",sans-serif; font-size:14px;}
+    label{display:block; font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:4px;}
+    .flash{padding:10px 14px; border-radius:8px; font-size:14px; margin-bottom:14px;}
+    .flash.ok{background:#e2f0e8; color:var(--green);}
+    .flash.err{background:#fbe3df; color:var(--red);}
+  </style>
+</head>
+<body>
+{% block body %}{% endblock %}
+</body>
+</html>

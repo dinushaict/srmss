@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Schedules — SRMSS{% endblock %}
+{% block body %}
+<header class="topbar">
+  <div class="brand"><span class="logo">SRMSS</span><span class="tag">Schedule Management</span></div>
+  <nav>
+    <span style="color:#9aa0a6; font-size:13px;">{{ username }}</span>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('routes') }}">Routes</a>
+    <a href="{{ url_for('fleet') }}">Fleet &amp; Logs</a>
+    <a href="{{ url_for('reports') }}">Reports</a>
+    <a href="{{ url_for('logout') }}">Log out</a>
+  </nav>
+</header>
+<main>
+  <h1>Schedules</h1>
+  <p class="sub">Daily / weekly / monthly timetables. Conflicts (same bus or driver, overlapping time) are rejected automatically.</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+  {% endwith %}
+
+  <div class="card">
+    <table>
+      <thead><tr><th>ID</th><th>Route</th><th>Bus</th><th>Driver</th><th>Date</th><th>Dep</th><th>Arr</th><th></th></tr></thead>
+      <tbody>
+      {% for s in schedules %}
+        <tr>
+          <td class="mono">#{{ s.schedule_id }}</td>
+          <td>{{ s.route.name }}</td>
+          <td class="mono">{{ s.bus.reg_no }}</td>
+          <td>{{ s.driver.name }}</td>
+          <td class="mono">{{ s.date }}</td>
+          <td class="mono">{{ s.departure_time.strftime('%H:%M') }}</td>
+          <td class="mono">{{ s.arrival_time.strftime('%H:%M') }}</td>
+          <td>
+            <form method="post" action="{{ url_for('cancel_schedule', schedule_id=s.schedule_id) }}" onsubmit="return confirm('Cancel this schedule?');">
+              <button class="btn" type="submit" style="background:#fbe3df; color:var(--red);">Cancel</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Add a schedule</h2>
+  <div class="card">
+    <form method="post" action="{{ url_for('schedules') }}" style="display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end;">
+      <div><label>Route</label>
+        <select name="route_id">{% for r in routes %}<option value="{{ r.route_id }}">{{ r.name }}</option>{% endfor %}</select></div>
+      <div><label>Bus</label>
+        <select name="bus_id">{% for b in buses %}<option value="{{ b.bus_id }}">{{ b.reg_no }}</option>{% endfor %}</select></div>
+      <div><label>Driver</label>
+        <select name="driver_id">{% for d in drivers %}<option value="{{ d.driver_id }}">{{ d.name }}</option>{% endfor %}</select></div>
+      <div><label>Start date</label><input type="date" name="date" value="{{ today }}"></div>
+      <div><label>Departure</label><input type="time" name="departure" value="09:00"></div>
+      <div><label>Arrival</label><input type="time" name="arrival" value="11:00"></div>
+      <div><label>Frequency</label>
+        <select name="frequency">
+          <option value="once">Once</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+        </select></div>
+      <div><label>Occurrences</label><input name="occurrences" type="number" value="1" min="1" style="width:90px;"></div>
+      <button class="btn" type="submit">Create</button>
+    </form>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Reports — SRMSS{% endblock %}
+{% block body %}
+<header class="topbar">
+  <div class="brand"><span class="logo">SRMSS</span><span class="tag">Reporting &amp; Analytics</span></div>
+  <nav>
+    <span style="color:#9aa0a6; font-size:13px;">{{ username }}</span>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('routes') }}">Routes</a>
+    <a href="{{ url_for('schedules') }}">Schedules</a>
+    <a href="{{ url_for('fleet') }}">Fleet &amp; Logs</a>
+    <a href="{{ url_for('logout') }}">Log out</a>
+  </nav>
+</header>
+<main>
+  <h1>Reports &amp; Analytics</h1>
+  <p class="sub">Fleet performance, trip completion, and route analytics. Export for management review.</p>
+
+  <div class="stat-row">
+    <div class="stat"><div class="k">On-time</div><div class="v">{{ trip_summary['on-time'] }}</div></div>
+    <div class="stat"><div class="k">Delayed</div><div class="v">{{ trip_summary['delayed'] }}</div></div>
+    <div class="stat"><div class="k">Completed</div><div class="v">{{ trip_summary['completed'] }}</div></div>
+    <div class="stat"><div class="k">Vehicle utilisation</div><div class="v">{{ utilisation }}%</div></div>
+  </div>
+
+  <h2>Fleet report</h2>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>{% for h in report.rows[0].keys() %}<th>{{ h }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+      {% for row in report.rows %}
+        <tr>{% for h in report.rows[0].keys() %}
+          <td class="{{ 'num' if h not in ['Bus','Type','Service Due'] else '' }}">{{ row[h] }}</td>
+        {% endfor %}</tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Route performance</h2>
+  <div class="card">
+    {% if route_performance %}
+    <table>
+      <thead><tr><th>Route</th><th>Trips</th><th>Completed</th><th>Completion %</th></tr></thead>
+      <tbody>
+      {% for r in route_performance %}
+        <tr>
+          <td>{{ r['Route'] }}</td>
+          <td class="num">{{ r['Trips'] }}</td>
+          <td class="num">{{ r['Completed'] }}</td>
+          <td class="num">{{ r['Completion %'] }}%</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p style="color:var(--muted);">No trips recorded yet.</p>{% endif %}
+  </div>
+
+  <p style="margin-top:18px;"><a class="btn" href="{{ url_for('report_pdf') }}">Download PDF</a></p>
+</main>
+{% endblock %}

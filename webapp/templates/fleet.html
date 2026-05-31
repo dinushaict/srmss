@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Fleet & Logs — SRMSS{% endblock %}
+{% block body %}
+<header class="topbar">
+  <div class="brand"><span class="logo">SRMSS</span><span class="tag">Fleet &amp; Logs</span></div>
+  <nav>
+    <span style="color:#9aa0a6; font-size:13px;">{{ username }}</span>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('routes') }}">Routes</a>
+    <a href="{{ url_for('schedules') }}">Schedules</a>
+    <a href="{{ url_for('reports') }}">Reports</a>
+    <a href="{{ url_for('logout') }}">Log out</a>
+  </nav>
+</header>
+<main>
+  <h1>Fleet &amp; Logs</h1>
+  <p class="sub">Vehicles, drivers, and fuel / maintenance logging.</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+  {% endwith %}
+
+  <h2>Vehicles</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Bus</th><th>Type</th><th>Capacity</th><th>Status</th><th>Fuel Cost</th><th>Maint. Cost</th><th>km/L</th><th>Service</th><th>Maintenance history</th></tr></thead>
+      <tbody>
+      {% for r in bus_rows %}
+        <tr>
+          <td class="mono">{{ r.bus.reg_no }}</td>
+          <td>{{ r.bus.type }}</td>
+          <td class="num">{{ r.bus.capacity }}</td>
+          <td><span class="pill {{ r.bus.status }}">{{ r.bus.status }}</span></td>
+          <td class="num">{{ '{:,.0f}'.format(r.fuel_cost) }}</td>
+          <td class="num">{{ '{:,.0f}'.format(r.maint_cost) }}</td>
+          <td class="num">{{ r.efficiency }}</td>
+          <td>{% if r.service_due %}<span class="pill due">DUE</span>{% else %}<span class="pill ok">OK</span>{% endif %}</td>
+          <td style="font-size:12px;">
+            {% if r.history %}{% for m in r.history %}{{ m.date }} · {{ m.type }}{% if not loop.last %}<br>{% endif %}{% endfor %}{% else %}—{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display:flex; gap:14px; flex-wrap:wrap;">
+    <div class="card" style="flex:1; min-width:320px;">
+      <h2 style="margin-top:0;">Log fuel usage</h2>
+      <form method="post" action="{{ url_for('fleet') }}">
+        <input type="hidden" name="kind" value="fuel">
+        <div style="margin-bottom:10px;"><label>Bus</label>
+          <select name="bus_id" style="width:100%;">{% for b in buses %}<option value="{{ b.bus_id }}">{{ b.reg_no }}</option>{% endfor %}</select></div>
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+          <div style="flex:1;"><label>Date</label><input type="date" name="date" value="{{ today }}" style="width:100%;"></div>
+          <div style="flex:1;"><label>Litres</label><input name="quantity" type="number" step="0.1" style="width:100%;"></div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:12px;">
+          <div style="flex:1;"><label>Cost</label><input name="cost" type="number" step="0.01" style="width:100%;"></div>
+          <div style="flex:1;"><label>Odometer</label><input name="odometer" type="number" style="width:100%;"></div>
+        </div>
+        <button class="btn" type="submit">Record fuel</button>
+      </form>
+    </div>
+
+    <div class="card" style="flex:1; min-width:320px;">
+      <h2 style="margin-top:0;">Log maintenance</h2>
+      <form method="post" action="{{ url_for('fleet') }}">
+        <input type="hidden" name="kind" value="maintenance">
+        <div style="margin-bottom:10px;"><label>Bus</label>
+          <select name="bus_id" style="width:100%;">{% for b in buses %}<option value="{{ b.bus_id }}">{{ b.reg_no }}</option>{% endfor %}</select></div>
+        <div style="margin-bottom:10px;"><label>Type / description</label><input name="type" style="width:100%;" placeholder="Routine service"></div>
+        <div style="margin-bottom:12px;"><label>Date</label><input type="date" name="date" value="{{ today }}"></div>
+        <div style="margin-bottom:12px;"><label>Cost</label><input name="cost" type="number" step="0.01"></div>
+        <button class="btn" type="submit">Record maintenance</button>
+      </form>
+    </div>
+  </div>
+
+  <h2>Drivers</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Driver</th><th>Licence</th><th>Status</th><th>Licence</th><th>Working hours</th><th>Assigned routes</th></tr></thead>
+      <tbody>
+      {% for r in driver_rows %}
+        <tr>
+          <td>{{ r.driver.name }}</td>
+          <td class="mono">{{ r.driver.license_no }}</td>
+          <td>{{ r.driver.status }}</td>
+          <td><span class="pill {{ 'ok' if r.driver.license_valid() else 'due' }}">{{ 'valid' if r.driver.license_valid() else 'expired' }}</span></td>
+          <td class="num">{{ r.hours }} h</td>
+          <td style="font-size:12px;">{{ r.routes | join(', ') if r.routes else '—' }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</main>
+{% endblock %}

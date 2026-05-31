@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — SRMSS{% endblock %}
+{% block body %}
+<header class="topbar">
+  <div class="brand"><span class="logo">SRMSS</span><span class="tag">Depot Dashboard</span></div>
+  <nav>
+    <span style="color:#9aa0a6; font-size:13px;">{{ username }}</span>
+    <a href="{{ url_for('routes') }}">Routes</a>
+    <a href="{{ url_for('schedules') }}">Schedules</a>
+    <a href="{{ url_for('fleet') }}">Fleet &amp; Logs</a>
+    <a href="{{ url_for('reports') }}">Reports</a>
+    <a href="{{ url_for('logout') }}">Log out</a>
+  </nav>
+</header>
+<main>
+  <h1>Kurunegala Central Depot</h1>
+  <p class="sub">Operational overview</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+  {% endwith %}
+
+  <div class="stat-row">
+    <div class="stat"><div class="k">Routes</div><div class="v">{{ counts.routes }}</div></div>
+    <div class="stat"><div class="k">Buses</div><div class="v">{{ counts.buses }}</div></div>
+    <div class="stat"><div class="k">Drivers</div><div class="v">{{ counts.drivers }}</div></div>
+    <div class="stat"><div class="k">Completed trips</div><div class="v">{{ trip_summary['completed'] }}</div></div>
+    <div class="stat"><div class="k">Vehicle utilisation</div><div class="v">{{ utilisation }}%</div></div>
+  </div>
+
+  <h2>Trips — status</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Trip</th><th>Route</th><th>Date</th><th>Status</th><th>Update</th></tr></thead>
+      <tbody>
+      {% for t in trips %}
+        <tr>
+          <td class="mono">#{{ t.trip_id }}</td>
+          <td>{{ t.schedule.route.name }}</td>
+          <td class="mono">{{ t.schedule.date }}</td>
+          <td><span class="pill {{ t.status }}">{{ t.status }}</span></td>
+          <td>
+            <form method="post" action="{{ url_for('update_trip', trip_id=t.trip_id) }}" style="display:flex; gap:8px;">
+              <select name="status">
+                {% for s in trip_statuses %}<option value="{{ s }}" {% if s==t.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+              </select>
+              <button class="btn" type="submit">Set</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Fleet</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Bus</th><th>Type</th><th>Status</th><th>Fuel Cost</th><th>Maint. Cost</th><th>Efficiency (km/L)</th><th>Service</th></tr></thead>
+      <tbody>
+      {% for r in fleet_rows %}
+        <tr>
+          <td class="mono">{{ r.reg_no }}</td>
+          <td>{{ r.type }}</td>
+          <td><span class="pill {{ r.status }}">{{ r.status }}</span></td>
+          <td class="num">{{ '{:,.0f}'.format(r.fuel_cost) }}</td>
+          <td class="num">{{ '{:,.0f}'.format(r.maint_cost) }}</td>
+          <td class="num">{{ r.efficiency }}</td>
+          <td>{% if r.service_due %}<span class="pill due">DUE</span>{% else %}<span class="pill ok">OK</span>{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Routes &amp; Drivers</h2>
+  <div style="display:flex; gap:14px; flex-wrap:wrap;">
+    <div class="card" style="flex:1; min-width:300px;">
+      <table>
+        <thead><tr><th>Route</th><th>Distance</th><th>Stops</th></tr></thead>
+        <tbody>
+        {% for route in routes %}
+          <tr><td>{{ route.name }}</td><td class="num">{{ route.distance }} km</td><td class="num">{{ route.stops|length }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="flex:1; min-width:300px;">
+      <table>
+        <thead><tr><th>Driver</th><th>Licence</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for d in drivers %}
+          <tr><td>{{ d.name }}</td><td class="mono">{{ d.license_no }}</td><td><span class="pill {{ 'ok' if d.license_valid() else 'due' }}">{{ 'valid' if d.license_valid() else 'expired' }}</span></td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+{% endblock %}
